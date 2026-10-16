@@ -1,0 +1,172 @@
+[
+  {
+    "id": 1,
+    "name": "Steel Tumbler",
+    "emoji": "🥤",
+    "category": "Drinkware",
+    "price": 19.99,
+    "description": "Double-wall steel tumbler that keeps drinks cold for 24 hours. Add your name with a laser engraving.",
+    "colors": [
+      "Black",
+      "Blue",
+      "Green",
+      "Orange",
+      "Pink"
+    ],
+    "sizes": [
+      "350 ml",
+      "500 ml",
+      "750 ml"
+    ],
+    "engravable": true,
+    "engraveStyle": "laser",
+    "engraveHint": "Laser-engrave a name"
+  },
+  {
+    "id": 2,
+    "name": "Personalised Cupcake Box",
+    "emoji": "🧁",
+    "category": "Bakery",
+    "price": 12.5,
+    "description": "Six fluffy cupcakes with silky frosting and a short message piped in icing.",
+    "colors": [
+      "Classic",
+      "Chocolate",
+      "Strawberry"
+    ],
+    "sizes": [
+      "Box of 4",
+      "Box of 6",
+      "Party box"
+    ],
+    "engravable": true,
+    "engraveStyle": "icing",
+    "engraveHint": "Write a message in icing"
+  },
+  {
+    "id": 3,
+    "name": "Classic Cotton Tee",
+    "emoji": "👕",
+    "category": "Fashion",
+    "price": 14.99,
+    "description": "Breathable 100% cotton tee with your name embroidered on the chest.",
+    "colors": [
+      "Black",
+      "White",
+      "Blue",
+      "Red",
+      "Green"
+    ],
+    "sizes": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "engravable": true,
+    "engraveStyle": "stitch",
+    "engraveHint": "Embroider a name on the chest"
+  },
+  {
+    "id": 4,
+    "name": "Wireless Headphones",
+    "emoji": "🎧",
+    "category": "Electronics",
+    "price": 59.99,
+    "description": "Over-ear Bluetooth headphones with deep bass and 30 hours of battery life.",
+    "colors": [
+      "Black",
+      "White",
+      "Blue",
+      "Pink"
+    ],
+    "sizes": [
+      "Lite",
+      "Standard",
+      "Pro"
+    ],
+    "engravable": false
+  },
+  {
+    "id": 5,
+    "name": "Leather Journal",
+    "emoji": "📔",
+    "category": "Stationery",
+    "price": 15.99,
+    "description": "Hand-stitched leather journal with thick cream pages. Add your initials on the cover.",
+    "colors": [
+      "Black",
+      "Beige",
+      "Red"
+    ],
+    "sizes": [
+      "A6",
+      "A5",
+      "A4"
+    ],
+    "engravable": true,
+    "engraveStyle": "gold",
+    "engraveHint": "Deboss a name in gold"
+  },
+  {
+    "id": 6,
+    "name": "Vanilla Candle",
+    "emoji": "🕯️",
+    "category": "Home Decor",
+    "price": 11.5,
+    "description": "Slow-burning soy candle with a warm vanilla scent. Burns for up to 40 hours.",
+    "colors": [
+      "White",
+      "Beige",
+      "Pink",
+      "Purple"
+    ],
+    "sizes": [
+      "Small",
+      "Medium",
+      "Large"
+    ],
+    "engravable": false
+  },
+  {
+    "id": 7,
+    "name": "Smart Watch",
+    "emoji": "⌚",
+    "category": "Electronics",
+    "price": 49,
+    "description": "Fitness tracking, heart-rate monitor and notifications on a bright always-on display.",
+    "colors": [
+      "Black",
+      "Silver",
+      "Pink",
+      "Green"
+    ],
+    "sizes": [
+      "Standard",
+      "Plus",
+      "Max"
+    ],
+    "engravable": false
+  },
+  {
+    "id": 8,
+    "name": "Birthday Cake",
+    "emoji": "🎂",
+    "category": "Bakery",
+    "price": 24.99,
+    "description": "Three-layer sponge cake with buttercream. Choose a flavour and write your own message on top.",
+    "colors": [
+      "Vanilla",
+      "Chocolate",
+      "Strawberry"
+    ],
+    "sizes": [
+      "Small",
+      "Regular",
+      "Family"
+    ],
+    "engravable": true,
+    "engraveStyle": "icing",
+    "engraveHint": "Write a message in icing"
+  }
+]

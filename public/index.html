@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coco's Mall – Walk-in Online Shopping</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="scroll-progress" id="scrollProgress"></div>
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <span class="brand">&#128717; COCO'S<span>&nbsp;MALL</span></span>
+      <span class="header-note" id="userChip">Grab a trolley &middot; walk in &middot; shop</span>
+      <span class="header-right">
+        <button type="button" class="trolley-link apibtn" id="openApi" aria-label="Open API Lab">&#128268; API Lab</button>
+        <button type="button" class="trolley-link" id="openCart" aria-label="Open trolley">&#128722; <b id="headCount">0</b></button>
+        <button type="button" class="btn-link" id="logoutBtn" hidden>Log out</button>
+      </span>
+    </div>
+    <nav class="container directory" id="directory" aria-label="Mall directory"></nav>
+  </header>
+
+  <main class="container mall">
+    <div>
+      <p class="you-are-here" id="youAreHere"></p>
+      <section class="mall-view" id="mallView" aria-label="Mall corridor" hidden><div class="world" id="world"></div></section>
+      <section class="shop" id="shop" hidden></section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer"><div class="container">Full Stack Development &middot; CS-301L &middot; Lab 05 &middot; Coco's Mall &middot; jQuery + API + Express</div></footer>
+  <button type="button" class="back-to-top" id="backToTop" aria-label="Back to top">&uarr;</button>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="hud"><button type="button" class="pad" id="padL" aria-label="Walk left">&#9664;</button><button type="button" class="pad" id="padR" aria-label="Walk right">&#9654;</button><span class="hudtext">&larr; &rarr; or A / D to walk &middot; E to enter a shop &middot; tap anywhere to walk</span></div>
+
+  <!-- ===== Entry flow: account -> shopper -> door -> cart ===== -->
+  <div class="gate" id="gate" hidden>
+    <section class="gstep" id="stAuth"><div class="gcard">
+      <h1>&#128717; COCO'S MALL</h1>
+      <div class="tabs"><button type="button" class="tab on" data-tab="login">Log in</button><button type="button" class="tab" data-tab="signup">Create account</button></div>
+      <form id="authForm" novalidate>
+        <div class="field" data-s="signup"><label for="auName">Full name</label><input type="text" id="auName" autocomplete="off"></div>
+        <div class="field"><label for="auEmail">Email</label><input type="email" id="auEmail" autocomplete="off"></div>
+        <div class="field"><label for="auPass">Password (min 6 characters)</label><input type="password" id="auPass" autocomplete="off"></div>
+        <div class="field" data-s="signup"><label>Are you female or male?</label>
+          <div class="gender"><label class="pay on"><input type="radio" name="gender" value="f" checked> &#128105; Female</label><label class="pay"><input type="radio" name="gender" value="m"> &#128104; Male</label></div></div>
+        <div class="field" data-s="signup"><label for="auAge">Your age</label><input type="number" id="auAge" min="3" max="110"></div>
+        <button type="submit" class="btn btn-primary wide" id="authBtn">Log in</button>
+        <p class="form-message" id="authMsg"></p>
+      </form></div></section>
+
+    <section class="gstep" id="stChar" hidden><div class="gcard wide">
+      <h2>Choose your shopper</h2><p class="hint" id="charHint"></p>
+      <div class="chips" id="genderSw"></div>
+      <div class="char-grid" id="charGrid"></div>
+      <label>Outfit colour</label><div class="swatches" id="outfitSw"></div>
+      <button type="button" class="btn btn-primary wide" id="charNext">Continue &rarr;</button></div></section>
+
+    <section class="gstep" id="stDoor" hidden><div class="gcard wide">
+      <h2>Welcome to Coco's Mall</h2>
+      <div class="entrance" id="entrance"><div class="eheader">COCO'S MALL &middot; OPEN</div><div class="edoors"><div class="dl"></div><div class="dr"></div></div><div class="efloor" id="efloor"></div></div>
+      <button type="button" class="btn btn-primary wide" id="enterBtn">&#128682; Enter the store</button></div></section>
+
+    <section class="gstep" id="stCart" hidden><div class="gcard wide">
+      <h2>Take a cart</h2><p class="hint">Pick what you will carry your shopping in.</p>
+      <div class="cart-grid" id="cartGrid"></div>
+      <button type="button" class="btn btn-primary wide" id="cartGo" disabled>Take it &amp; start shopping &rarr;</button></div></section>
+  </div>
+
+  <!-- ===== Trolley drawer ===== -->
+  <div class="overlay" id="overlay" hidden></div>
+  <aside class="cart-panel" id="cartPanel" aria-label="Shopping trolley" aria-hidden="true">
+    <div class="drawer-head"><h2>&#128722; Your trolley <span class="cart-count" id="cartCount">0</span></h2><button type="button" class="close-btn" id="closeCart" aria-label="Close trolley">&times;</button></div>
+    <div class="drawer-body">
+      <div class="drop-zone" id="dropZone"><div class="drop-icon">&#128722;</div><p class="drop-text" id="dropText">Drag any product here</p></div>
+      <div class="free-ship"><div class="bar"><i id="shipBar"></i></div><small id="shipText"></small></div>
+      <ul class="cart-list" id="cartList"></ul>
+      <div class="sum"><div><span>Subtotal</span><span id="sumSub">$0.00</span></div><div><span>Delivery</span><span id="sumDel">$0.00</span></div><div class="cart-total"><span>Total</span><strong id="cartTotal">$0.00</strong></div></div>
+      <button type="button" class="btn btn-primary wide" id="checkoutBtn">Proceed to checkout &rarr;</button>
+
+      <form id="checkoutForm" hidden novalidate>
+        <h3>Delivery details</h3>
+        <div class="field"><label for="customerName">Full name <span class="req">*</span></label><input type="text" id="customerName" placeholder="Your name" autocomplete="off"><small class="error"></small></div>
+        <div class="field"><label for="customerEmail">Email address <span class="req">*</span></label><input type="email" id="customerEmail" placeholder="you@example.com" autocomplete="off"><small class="error"></small></div>
+        <div class="field"><label for="customerPhone">Phone number <span class="req">*</span></label><input type="tel" id="customerPhone" placeholder="+92 300 1234567" autocomplete="off"><small class="error"></small></div>
+        <div class="field"><label for="customerAddress">Delivery address <span class="req">*</span></label><input type="text" id="customerAddress" placeholder="House / street / area" autocomplete="off"><small class="error"></small></div>
+        <div class="field"><label for="customerCity">City <span class="req">*</span></label><input type="text" id="customerCity" placeholder="e.g. Lahore" autocomplete="off"><small class="error"></small></div>
+        <h3>Delivery speed</h3>
+        <div class="ship-options">
+          <label class="ship on"><input type="radio" name="ship" value="standard" checked><span class="ship-ic">&#128230;</span><span class="ship-tx"><b>Standard</b><small>Arrives in 3&ndash;5 days</small></span><em id="shipStd">$4.99</em></label>
+          <label class="ship"><input type="radio" name="ship" value="express"><span class="ship-ic">&#128666;</span><span class="ship-tx"><b>Express</b><small>Arrives within 2 days</small></span><em>$7.99</em></label>
+          <label class="ship"><input type="radio" name="ship" value="sameday"><span class="ship-ic">&#9889;</span><span class="ship-tx"><b>24-hour delivery</b><small>At your door within 24 hours</small></span><em>$12.99</em></label>
+        </div>
+        <h3>Payment method</h3>
+        <div class="pay-options">
+          <label class="pay on"><input type="radio" name="pay" value="cod" checked><span><b>&#128181; Cash on Delivery</b><small>Pay cash when your order arrives</small></span></label>
+          <label class="pay"><input type="radio" name="pay" value="card"><span><b>&#128179; Credit / Debit Card</b><small>Visa &middot; Mastercard</small></span></label>
+          <label class="pay"><input type="radio" name="pay" value="wallet"><span><b>&#128241; Mobile Wallet</b><small>JazzCash &middot; Easypaisa</small></span></label>
+        </div>
+        <div id="cardFields" hidden>
+          <div class="ccprev" id="ccPrev"><span class="cc-chip"></span><span class="cc-brand" id="ccBrand">CARD</span><div class="cc-num" id="ccNum">&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull;</div><div class="cc-row"><span id="ccName">YOUR NAME</span><span id="ccExp">MM/YY</span></div></div>
+          <div class="field"><label for="cardNumber">Card number</label><input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" inputmode="numeric" autocomplete="off"><small class="error"></small></div>
+          <div class="two">
+            <div class="field"><label for="cardExpiry">Expiry</label><input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" autocomplete="off"><small class="error"></small></div>
+            <div class="field"><label for="cardCvv">CVV</label><input type="password" id="cardCvv" placeholder="123" maxlength="4" inputmode="numeric" autocomplete="off"><small class="error"></small></div>
+          </div>
+        </div>
+        <div class="button-row">
+          <button type="submit" class="btn btn-primary" id="placeBtn">Place order</button>
+          <button type="button" class="btn btn-ghost" id="backToCart">&larr; Back</button>
+          <button type="reset" class="btn btn-ghost">Empty &amp; Reset</button>
+        </div>
+        <p class="form-message" id="formMessage" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </aside>
+
+  <!-- ===== Product viewer: demo + 3D + engraving ===== -->
+  <div class="modal" id="productModal" hidden role="dialog" aria-modal="true" aria-label="Product viewer">
+    <div class="modal-box pm-big">
+      <button type="button" class="close-btn" id="closeModal" aria-label="Close">&times;</button>
+      <div class="pm-left">
+        <div class="stage" id="stage"><div class="obj" id="obj"></div><span class="eng-badge" id="engBadge" hidden>&#10024; Can be engraved</span><span class="pack-badge" id="packBadge" hidden></span><div class="spotlight" id="spotlight"></div><span class="state-badge" id="stateBadge">Idle</span><span class="drag-hint" id="dragHandle" draggable="true" title="Drag me into the trolley">&#9995; Drag me to the trolley</span></div>
+        <p class="pointer-readout" id="pointerReadout">Rotation: 0&deg; &middot; drag the product to spin it</p>
+        <div class="demo" id="demo" aria-label="Product demo">
+          <div class="demo-brand">COCO'S MALL</div>
+          <div class="demo-stage" id="demoStage"><span class="demo-emo" id="demoEmo"></span><span class="demo-eng" id="demoEng"></span><span class="demo-cart" id="demoCart">&#128722;</span><i class="sp s1">&#10022;</i><i class="sp s2">&#10022;</i><i class="sp s3">&#10022;</i><i class="sp s4">&#10022;</i></div>
+          <div class="demo-cap" id="demoCap"></div>
+          <div class="demo-bar"><i id="demoBar"></i></div>
+          <button type="button" class="demo-play" id="demoPlay" aria-label="Pause demo">&#10074;&#10074;</button>
+        </div>
+      </div>
+      <div class="pm-right pscope">
+        <h2 id="pmName" class="protect"></h2>
+        <p class="price"><span id="pmPrice"></span> <small id="pmCat"></small></p>
+        <p id="pmDesc" class="pm-desc protect"></p>
+        <p class="protected-message" id="copyMessage" role="status" aria-live="polite"></p>
+        <div class="field"><label>1. Choose a <span id="pmOptLabel">Colour</span> <em class="tag-free">FREE</em> <span class="hint" id="pmColorName"></span></label><div class="swatches" id="pmColors"></div></div>
+        <div class="field"><label>2. Size <em class="tag-free">FREE</em></label><div class="chips" id="pmSizes"></div></div>
+        <div class="field pm-eng" id="pmEngrave" hidden>
+          <label for="pmEngInput">3. Engraving / personal message <em class="tag-free">FREE</em></label>
+          <input type="text" id="pmEngInput" maxlength="16" placeholder="e.g. Coco" autocomplete="off">
+          <div class="counter-row"><small class="hint" id="pmEngHint"></small><small class="counter" id="pmEngCount">0 / 16</small></div>
+          <div class="chips" id="pmFonts"><button type="button" class="chip on" data-f="classic">Classic</button><button type="button" class="chip" data-f="script">Script</button><button type="button" class="chip" data-f="block">Block</button></div>
+        </div>
+        <button type="button" class="btn btn-secondary wide" id="pmAdd">&#128722; Add to trolley</button>
+        <button type="button" class="btn btn-ghost wide" id="pmSave">&#128190; Save configuration to server (POST)</button>
+        <div class="save-msg" id="pmSaveMsg" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Reception ===== -->
+  <div class="modal" id="receptionModal" hidden role="dialog" aria-modal="true" aria-label="Reception">
+    <div class="modal-box">
+      <button type="button" class="close-btn" id="closeRec" aria-label="Close">&times;</button>
+      <div id="recBody"></div>
+    </div>
+  </div>
+
+  <!-- ===== Receipt ===== -->
+  <div class="modal" id="resultPanel" hidden role="dialog" aria-modal="true" aria-label="Receipt">
+    <div class="modal-box result-panel">
+      <button type="button" class="close-btn" id="closeResult" aria-label="Close">&times;</button>
+      <div id="resultBody"></div>
+      <div class="button-row rc-actions">
+        <button type="button" class="btn btn-secondary" id="keepShopping">Continue shopping</button>
+        <button type="button" class="btn btn-ghost" id="printBtn">&#128424;&#65039; Print receipt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== API Lab (Lab 05 Q2 + Q3) ===== -->
+  <div class="modal" id="apiModal" hidden role="dialog" aria-modal="true" aria-label="API Lab">
+    <div class="modal-box api-box pscope">
+      <button type="button" class="close-btn" id="closeApi" aria-label="Close">&times;</button>
+      <h2>&#128268; API Lab <small>jQuery AJAX &middot; public API &middot; Express server</small></h2>
+      <div class="api-tabs" id="apiTabs">
+        <button type="button" class="atab on" data-pane="public">&#127760; Public API (GET)</button>
+        <button type="button" class="atab" data-pane="server">&#128421;&#65039; My Express server (GET)</button>
+        <button type="button" class="atab" data-pane="saved">&#128220; Saved configurations (GET)</button>
+      </div>
+
+      <section class="api-pane" data-pane="public">
+        <p class="hint">Live products from the public <b>DummyJSON</b> API &ndash; <code>GET https://dummyjson.com/products</code>. Pick a category (or search), press <b>Load</b>, then customise any product.</p>
+        <div class="api-controls">
+          <select id="apiCat" aria-label="Category">
+            <option value="all">All products</option><option value="smartphones">Smartphones</option><option value="laptops">Laptops</option><option value="fragrances">Fragrances</option>
+            <option value="groceries">Groceries</option><option value="furniture">Furniture</option><option value="mens-shirts">Men's shirts</option><option value="womens-bags">Women's bags</option>
+            <option value="sunglasses">Sunglasses</option><option value="mens-watches">Men's watches</option><option value="kitchen-accessories">Kitchen accessories</option>
+          </select>
+          <input type="text" id="apiSearch" placeholder="or search, e.g. phone" autocomplete="off">
+          <button type="button" class="btn btn-secondary" id="apiLoad">Load products (GET)</button>
+          <button type="button" class="btn btn-ghost" id="apiFail">&#9888; Test a failing request</button>
+        </div>
+        <div class="api-grid" id="apiGrid"><p class="api-empty">Nothing loaded yet &ndash; press <b>Load products</b>.</p></div>
+      </section>
+
+      <section class="api-pane" data-pane="server" hidden>
+        <p class="hint">Products from <b>your own Node.js + Express server</b> &ndash; <code>GET /api/products</code>. Start it with <code>npm start</code>.</p>
+        <div class="api-controls">
+          <input type="text" id="srvBase" value="http://localhost:3000" aria-label="Server address" autocomplete="off">
+          <select id="srvCat" aria-label="Category filter">
+            <option value="">All categories</option><option>Drinkware</option><option>Bakery</option><option>Fashion</option><option>Electronics</option><option>Stationery</option><option>Home Decor</option>
+          </select>
+          <button type="button" class="btn btn-secondary" id="srvLoad">Load from Express (GET)</button>
+        </div>
+        <div class="api-grid" id="srvGrid"><p class="api-empty">Nothing loaded yet &ndash; press <b>Load from Express</b>.</p></div>
+      </section>
+
+      <section class="api-pane" data-pane="saved" hidden>
+        <p class="hint">Configurations you saved with <b>POST /api/configurations</b> (open a product &rarr; <i>Save configuration to server</i>). This list is read with <code>GET /api/configurations</code>.</p>
+        <div class="api-controls"><button type="button" class="btn btn-secondary" id="savedLoad">Refresh list (GET)</button></div>
+        <div class="table-wrap"><table class="saved-table" id="savedTable"><thead><tr><th>ID</th><th>Product</th><th>Colour</th><th>Size</th><th>Engraving</th><th>Received</th></tr></thead><tbody><tr><td colspan="6" class="api-empty">Nothing loaded yet.</td></tr></tbody></table></div>
+      </section>
+
+      <p class="protected-message" id="apiCopyMsg" role="status" aria-live="polite"></p>
+
+      <div class="inspector" id="inspector">
+        <h3>&#128269; Request / response inspector <small>&ndash; the same traffic is visible in DevTools &rarr; Network</small></h3>
+        <div class="insp-row"><span class="insp-lbl">1&middot; Request</span><code id="inReq">No request sent yet.</code></div>
+        <div class="insp-row"><span class="insp-lbl">2&middot; Status</span><span><span class="pill" id="inStatus">&mdash;</span> <small id="inTime"></small></span></div>
+        <div class="insp-row" id="inBodyRow" hidden><span class="insp-lbl">3&middot; JSON body sent<br><small>JSON.stringify(object)</small></span><pre id="inBody"></pre></div>
+        <div class="insp-row"><span class="insp-lbl">4&middot; JSON response</span><pre id="inJson">&mdash;</pre></div>
+        <div class="insp-row"><span class="insp-lbl">5&middot; Handled by</span><span id="inHandled">&mdash;</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/jquery.min.js"></script>
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+  <script src="api.js"></script>
+</body>
+</html>
